@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
 
 
     val kotlinDirectStat = Measures("Kotlin direct", numberOfSessions,
-//        CONSTRUCTOR_CALL,
+        CONSTRUCTOR_CALL,
         ATTR_SET,
         ATTR_REFLECTION,
         ATTR_REFLECTION_CACHE
@@ -28,7 +28,9 @@ fun main(args: Array<String>) {
     for (i in 0 until numberOfSessions) {
         val id = i.toLong()
 
-        val obj = newPersonOfRandomClass()
+        val obj = kotlinDirectStat.track(CONSTRUCTOR_CALL) {
+            newPersonOfRandomClass()
+        }
 
         kotlinDirectStat.track(ATTR_SET) {
             obj.name = "123"
