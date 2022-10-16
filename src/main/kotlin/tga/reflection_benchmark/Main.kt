@@ -4,10 +4,10 @@ import tga.benchmark_utils.Measures
 import tga.benchmark_utils.PrintUnits.NANO_SECONDS
 import java.lang.reflect.Method
 
-const val CONSTRUCTOR_CALL      = "         constructor"
-const val ATTR_SET              = "             setName"
-const val ATTR_REFLECTION       = "(ref)       setPhone"
-const val ATTR_REFLECTION_CACHE = "(ref + cache) setDay"
+const val ATTR_SET              = "common interface    "
+const val ATTR_REFLECTION       = "reflection          "
+const val ATTR_REFLECTION_CACHE = "reflection + hashmap"
+const val ATTR_SWITCH           = "when(obj)           "
 
 
 
@@ -17,10 +17,10 @@ fun main(args: Array<String>) {
 
 
     val kotlinDirectStat = Measures("Kotlin direct", numberOfSessions,
-        CONSTRUCTOR_CALL,
         ATTR_SET,
         ATTR_REFLECTION,
-        ATTR_REFLECTION_CACHE
+        ATTR_REFLECTION_CACHE,
+        ATTR_SWITCH
     )
 
     val mapSetters = HashMap<Class<*>, Method>()
@@ -28,9 +28,7 @@ fun main(args: Array<String>) {
     for (i in 0 until numberOfSessions) {
         val id = i.toLong()
 
-        val obj = kotlinDirectStat.track(CONSTRUCTOR_CALL) {
-            newPersonOfRandomClass()
-        }
+        val obj = newPersonOfRandomClass()
 
         kotlinDirectStat.track(ATTR_SET) {
             obj.name = "123"
@@ -47,6 +45,10 @@ fun main(args: Array<String>) {
                 objClass.getMethod("setDay", String::class.java)
             }
             setter.invoke(obj, "567")
+        }
+
+        kotlinDirectStat.track(ATTR_SWITCH) {
+            obj.setGoalSwitch("678")
         }
 
     }
