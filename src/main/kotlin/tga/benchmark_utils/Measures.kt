@@ -1,6 +1,8 @@
 package tga.benchmark_utils
 
-class Measures(var name: String, capacity: Int, vararg names: String) {
+import tga.text_table.printTable
+
+class Measures(var name: String, capacity: Int, val names: Array<String>) {
     private val measures: HashMap<String, ArrayList<Long>> = HashMap()
 
     init {
@@ -19,35 +21,45 @@ class Measures(var name: String, capacity: Int, vararg names: String) {
 
     fun printStatistic(units: PrintUnits) {
         printAvgStatistic(units)
+        println("")
         printPercentiles(units)
     }
 
     fun printAvgStatistic(units: PrintUnits){
-        println("$name ($units): min - avg - max {")
-        for ( (name, stat) in measures) {
+        val table = Array<Array<Any>>(5){ emptyArray() }
+        table[0] = arrayOf("$name ($units)", "min", "avg", "max")
+
+        var i = 0
+        for (statName in names) {
+            val stat = measures[statName]!!
             val mins = stat.min().toOutput(units)
             val maxs = stat.max().toOutput(units)
             val avgs = stat.average().toLong().toOutput(units)
-            println("\t$name: $mins - $avgs - $maxs")
+            table[++i] = arrayOf(statName, mins, avgs, maxs)
         }
-        println("}")
+        printTable(table){ it.joinToString() }
     }
 
     fun printPercentiles(units: PrintUnits){
-        println("$name ($units): percentiles {")
-        for ( (statName, stat) in measures) {
-            val pcnt: Array<Pair<Int, Long>> = percentilesForStat(stat)
-            val pcntStr = pcnt.map{ (percentile, percentileValue) ->
-                "$percentile%: ${percentileValue.toOutput(units)}"
+        val table = Array<Array<Any>>(5){ emptyArray() }
+        table[0] = arrayOf("$name ($units)", "100%", "90%", "80%", "70%", "60%", "50%", "40%", "30%", "20%", "10%")
+        var l = 0
+
+
+        for (statName in names) {
+            val stat = measures[statName]!!
+            val percentiles = percentilesForStat(stat)
+            table[++l] = Array<Any>(11){
+                when(it) {
+                    0 -> statName
+                    else -> percentiles[it-1].toOutput(units)
+                }
             }
-            println("\t$statName: [${pcntStr.joinToString()}]")
         }
-
-        println("}")
-
+        printTable(table){ it.joinToString("  ") }
     }
 
-    private fun percentilesForStat(stat: java.util.ArrayList<Long>): Array<Pair<Int, Long>> {
+    private fun percentilesForStat(stat: java.util.ArrayList<Long>): Array<Long> {
         val sortedStat = stat.sorted()
         val size = stat.size
 
@@ -61,7 +73,7 @@ class Measures(var name: String, capacity: Int, vararg names: String) {
                 (stat.size * prc).toInt() - 1
             }
 
-            p to sortedStat[i]
+            sortedStat[i]
         }
 
         result.reverse()
@@ -79,10 +91,11 @@ class Measures(var name: String, capacity: Int, vararg names: String) {
     private fun Long.toMillis(): String {
         val d = this.toDouble()
         val r = d / 1000000.0
-        return String.format("%1\$,.2f", r).padStart(8) + "ms"
+        return String.format("%1\$,.2f", r) + "ms"
     }
 
     private fun Long.toNanos(): String {
         val n = this
-        return n.toString().padStart(4)    }
+        return n.toString()
+    }
 }

@@ -13,15 +13,15 @@ const val ATTR_SWITCH           = "when(obj)           "
 
 fun main(args: Array<String>) {
     // val wormAuSessions = 10_000
-    val numberOfSessions = 10000000
+    val numberOfSessions = 30000000
 
 
-    val kotlinDirectStat = Measures("Kotlin direct", numberOfSessions,
+    val kotlinDirectStat = Measures("Kotlin direct", numberOfSessions, arrayOf(
         ATTR_SET,
         ATTR_REFLECTION,
         ATTR_REFLECTION_CACHE,
         ATTR_SWITCH
-    )
+    ))
 
     val mapSetters = HashMap<Class<*>, Method>()
 
