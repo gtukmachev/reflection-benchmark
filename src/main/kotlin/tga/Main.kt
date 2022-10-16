@@ -4,19 +4,17 @@ import tga.benchmark_utils.Measures
 import tga.benchmark_utils.PrintUnits.NANO_SECONDS
 import java.lang.reflect.Method
 
-const val ATTR_SET              = "common interface    "
-const val ATTR_REFLECTION       = "reflection          "
-const val ATTR_REFLECTION_CACHE = "reflection + hashmap"
-const val ATTR_SWITCH           = "when(obj)           "
+const val ATTR_SET              = "polymorphism (common interface)"
+const val ATTR_REFLECTION       = "reflection obj::Class.getMethod + method.invoke(..)"
+const val ATTR_REFLECTION_CACHE = "reflection + HashMap cache (onj::Class) -> setter method"
+const val ATTR_SWITCH           = "when(obj) {is Class1 -> obj.setVal(...) ... }"
 
 
 
-fun main(args: Array<String>) {
-    // val wormAuSessions = 10_000
-    val numberOfSessions = 30000000
+fun main() {
+    val numberOfSessions = 10_000_000
 
-
-    val kotlinDirectStat = Measures("Kotlin direct", numberOfSessions, arrayOf(
+    val kotlinDirectStat = Measures("Kotlin set field value", numberOfSessions, arrayOf(
         ATTR_SET,
         ATTR_REFLECTION,
         ATTR_REFLECTION_CACHE,
@@ -26,8 +24,6 @@ fun main(args: Array<String>) {
     val mapSetters = HashMap<Class<*>, Method>()
 
     for (i in 0 until numberOfSessions) {
-        val id = i.toLong()
-
         val obj = newPersonOfRandomClass()
 
         kotlinDirectStat.track(ATTR_SET) {

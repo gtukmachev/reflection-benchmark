@@ -27,7 +27,7 @@ class Measures(var name: String, capacity: Int, val names: Array<String>) {
 
     fun printAvgStatistic(units: PrintUnits){
         val table = Array<Array<Any>>(5){ emptyArray() }
-        table[0] = arrayOf("$name ($units)", "min", "avg", "max")
+        table[0] = arrayOf("'$name' ($units)", "min", "avg", "max")
 
         var i = 0
         for (statName in names) {
@@ -42,7 +42,7 @@ class Measures(var name: String, capacity: Int, val names: Array<String>) {
 
     fun printPercentiles(units: PrintUnits){
         val table = Array<Array<Any>>(5){ emptyArray() }
-        table[0] = arrayOf("$name ($units)", "100%", "90%", "80%", "70%", "60%", "50%", "40%", "30%", "20%", "10%")
+        table[0] = arrayOf("'$name' percentiles ($units) ", "100%", "90%", "80%", "70%", "60%", "50%", "40%", "30%", "20%", "10%")
         var l = 0
 
 
