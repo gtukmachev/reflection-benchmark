@@ -1,7 +1,7 @@
 package tga.reflection_benchmark
 
-import tga.benchmark_utils.Measures
-import tga.benchmark_utils.PrintUnits.NANO_SECONDS
+import tga.reflection_benchmark.benchmark_utils.Measures
+import tga.reflection_benchmark.benchmark_utils.PrintUnits.NANO_SECONDS
 import java.lang.reflect.Method
 
 const val ATTR_SET              = "polymorphism (common interface)"

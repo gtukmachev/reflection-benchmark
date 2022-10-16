@@ -1,4 +1,4 @@
-package tga.text_table
+package tga.reflection_benchmark.text_table
 
 fun printTable(table: Array<Array<Any>>, joiner: (Array<String>) -> String) {
     val forPrint = toSameWidth(table)

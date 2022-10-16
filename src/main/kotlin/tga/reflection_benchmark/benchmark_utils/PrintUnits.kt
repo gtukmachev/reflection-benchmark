@@ -1,4 +1,4 @@
-package tga.benchmark_utils
+package tga.reflection_benchmark.benchmark_utils
 
 enum class PrintUnits {
     NANO_SECONDS,
