@@ -3,11 +3,13 @@ package tga.reflection_benchmark
 import tga.reflection_benchmark.benchmark_utils.Measures
 import tga.reflection_benchmark.benchmark_utils.PrintUnits.NANO_SECONDS
 import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
 
-const val ATTR_SET              = "polymorphism (common interface)"
-const val ATTR_REFLECTION       = "reflection obj::Class.getMethod + method.invoke(..)"
-const val ATTR_REFLECTION_CACHE = "reflection + HashMap cache (onj::Class) -> setter method"
-const val ATTR_SWITCH           = "when(obj) {is Class1 -> obj.setVal(...) ... }"
+const val ATTR_SET                  = "polymorphism (common interface)"
+const val ATTR_REFLECTION           = "reflection obj::Class.getMethod + method.invoke(..)"
+const val ATTR_REFLECTION_CACHE     = "reflection +           HashMap cache (onj::Class) -> setter method"
+const val ATTR_REFLECTION_CON_CACHE = "reflection + ConcurrentHashMap cache (onj::Class) -> setter method"
+const val ATTR_SWITCH               = "when(obj) {is Class1 -> obj.setVal(...) ... }"
 
 
 
@@ -18,10 +20,12 @@ fun main() {
         ATTR_SET,
         ATTR_REFLECTION,
         ATTR_REFLECTION_CACHE,
+        ATTR_REFLECTION_CON_CACHE,
         ATTR_SWITCH
     ))
 
     val mapSetters = HashMap<Class<*>, Method>()
+    val mapSettersConcurrent = ConcurrentHashMap<Class<*>, Method>()
 
     for (i in 0 until numberOfSessions) {
         val obj = newPersonOfRandomClass()
@@ -35,12 +39,18 @@ fun main() {
             setter.invoke(obj, "345")
         }
 
-
         kotlinDirectStat.track(ATTR_REFLECTION_CACHE) {
             val setter = mapSetters.computeIfAbsent(obj::class.java) { objClass ->
                 objClass.getMethod("setDay", String::class.java)
             }
             setter.invoke(obj, "567")
+        }
+
+        kotlinDirectStat.track(ATTR_REFLECTION_CON_CACHE) {
+            val setter = mapSettersConcurrent.computeIfAbsent(obj::class.java) { objClass ->
+                objClass.getMethod("setDay", String::class.java)
+            }
+            setter.invoke(obj, "q2w")
         }
 
         kotlinDirectStat.track(ATTR_SWITCH) {

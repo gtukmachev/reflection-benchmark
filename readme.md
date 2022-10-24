@@ -15,34 +15,39 @@ How exactly we can solve the problem described above.
 4. when(obj) {is Class1 -> obj.setVal(...) ... }
 
 ### 1. polymorphism (common interface)
-
+TBD
 ### 2. reflection obj::Class.getMethod + method.invoke(..)
+TBD
 
 ### 3. reflection + HashMap cache (onj::Class) -> setter method
+The same as reflection, but instead of getting a setter each time using the Java reflection 
+- I put the methods to a hashmap.
 
-### 4. when(obj) {is Class1 -> obj.setVal(...) ... }
+### 4. reflection + ConcurrentHashMap cache (onj::Class) -> setter method
+I expect to see some worse results in comparing with the `HashMap`, but, surprisingly - its better!
 
+### 5. when(obj) {is Class1 -> obj.setVal(...) ... }
+TBD
 ## Results:
 I was a bit shocked by the achieved results:
 
 The approach `#4` demonstrates the best performance (fastest).
 To be honest - I expected to see the best results for the `#1` as the most OOP native solution. 
 
-```
-                 'Kotlin set field value' (NANO_SECONDS)     min  avg      max
-                                                       .  .    .    .        .
-                         polymorphism (common interface)  :   17   38   132295
-     reflection obj::Class.getMethod + method.invoke(..)  :   69  128  7759136
-reflection + HashMap cache (onj::Class) -> setter method  :   27   55   842751
-           when(obj) {is Class1 -> obj.setVal(...) ... }  :   16   31  5918098
-           
+```bash
+                           'Kotlin set field value' (NANO_SECONDS)     min  avg       max
+                                                                 .  .    .    .         .
+                                   polymorphism (common interface)  :   17   40    138171
+               reflection obj::Class.getMethod + method.invoke(..)  :   69  129  12750255
+reflection +           HashMap cache (onj::Class) -> setter method  :   27   56    575397
+reflection + ConcurrentHashMap cache (onj::Class) -> setter method  :   27   46   4697414
+                     when(obj) {is Class1 -> obj.setVal(...) ... }  :   16   31   5981066
 
-
-    'Kotlin set field value' percentiles (NANO_SECONDS)         100%  90%  80%  70%  60%  50%  40%  30%  20%  10%
-                                                       .  .        .    .    .    .    .    .    .    .    .    .
-                         polymorphism (common interface)  :   132295   43   40   39   38   38   37   36   35   31
-     reflection obj::Class.getMethod + method.invoke(..)  :  7759136  124  118  115  113  111  110  108  106  102
-reflection + HashMap cache (onj::Class) -> setter method  :   842751   65   60   58   53   47   45   44   42   40
-           when(obj) {is Class1 -> obj.setVal(...) ... }  :  5918098   41   36   34   31   29   26   23   21   20
-
+              'Kotlin set field value' percentiles (NANO_SECONDS)          100%  90%  80%  70%  60%  50%  40%  30%  20%  10%
+                                                                 .  .         .    .    .    .    .    .    .    .    .    .
+                                   polymorphism (common interface)  :    138171   46   43   41   40   39   38   37   36   33
+               reflection obj::Class.getMethod + method.invoke(..)  :  12750255  126  119  116  114  112  111  110  108  105
+reflection +           HashMap cache (onj::Class) -> setter method  :    575397   68   63   60   58   54   48   45   43   40
+reflection + ConcurrentHashMap cache (onj::Class) -> setter method  :   4697414   53   49   46   43   40   38   37   36   34
+                     when(obj) {is Class1 -> obj.setVal(...) ... }  :   5981066   42   37   34   31   28   26   23   21   19
 ```
